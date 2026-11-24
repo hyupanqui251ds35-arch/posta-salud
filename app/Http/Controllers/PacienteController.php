@@ -37,43 +37,51 @@ class PacienteController extends Controller
     return view('pacientes.create', ['paciente' => new Paciente()]);
     }
 
-public function store(StorePacienteRequest $request)
-{
-    $paciente = Paciente::create($request->validated());
+    public function store(StorePacienteRequest $request)
+    {
+        $paciente = Paciente::create($request->validated());
 
-    return redirect()->route('pacientes.show', $paciente)
-        ->with('ok', 'Paciente registrado correctamente.');
-}
+        return redirect()->route('pacientes.show', $paciente)
+            ->with('ok', 'Paciente registrado correctamente.');
+    }
 
-public function show(Paciente $paciente)
-{
-    $citas = $paciente->citas()
-        ->with('personalMedico')
-        ->latest('fecha_hora')
-        ->take(5)
-        ->get();
+    public function show(Paciente $paciente)
+    {
+        $citas = $paciente->citas()
+            ->with('personalMedico')
+            ->latest('fecha_hora')
+            ->take(5)
+            ->get();
 
-    return view('pacientes.show', compact('paciente', 'citas'));
-}
+        return view('pacientes.show', compact('paciente', 'citas'));
+    }
 
-public function edit(Paciente $paciente)
-{
-    return view('pacientes.edit', compact('paciente'));
-}
+    public function edit(Paciente $paciente)
+    {
+        return view('pacientes.edit', compact('paciente'));
+    }
 
-public function update(UpdatePacienteRequest $request, Paciente $paciente)
-{
-    $paciente->update($request->validated());
+    public function update(UpdatePacienteRequest $request, Paciente $paciente)
+    {
+        $paciente->update($request->validated());
 
-    return redirect()->route('pacientes.show', $paciente)
-        ->with('ok', 'Datos del paciente actualizados.');
-}
+        return redirect()->route('pacientes.show', $paciente)
+            ->with('ok', 'Datos del paciente actualizados.');
+    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-public function destroy(Paciente $paciente)
-{
-        //
+        /**
+         * Remove the specified resource from storage.
+         */
+    public function destroy(Paciente $paciente)
+    {
+    if ($paciente->citas()->exists()) {
+        return back()->with('error',
+            'No se puede eliminar: el paciente tiene citas registradas.');
+    }
+
+    $paciente->delete();
+
+    return redirect()->route('pacientes.index')
+        ->with('ok', 'Paciente eliminado.');
     }
 }
