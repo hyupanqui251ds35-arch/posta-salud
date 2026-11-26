@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('titulo', 'Registrar profesional')
+@section('titulo', 'Registrar medico')
 
 @section('contenido')
-    <h1>Registrar profesional</h1>
+    <h1>Registrar medico</h1>
 
     <form method="POST" novalidate action="{{ route('personal-medico.store') }}">
         @csrf
